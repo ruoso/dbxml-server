@@ -1,0 +1,6 @@
+This is an implementation of a thread-based query server for the
+Berkeley DB XML database. The importance of this application is to
+centralize the access to the BerkeleyDB environment, since it's just a
+library.
+
+
