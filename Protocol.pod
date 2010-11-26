@@ -1,0 +1,151 @@
+=head1 Protocol Specification
+
+This document describes the network protocol to be used by the
+dbxml-server.
+
+=head1 VERSION
+
+This is the version 0.001 of the protocol.
+
+=head1 Concepts
+
+=over
+
+=item Session
+
+Each connection represents a session, must be specific to a single
+database environment. The authentication and authorization happens at
+the session level. There is no support for additional security
+control.
+
+=item Statement Handle
+
+Whenever you execute a query, a statement handle is initialized. It is
+through the statement handle that you fetch the results from the
+query.
+
+=back
+
+=head1 Protocol Layers
+
+=over
+
+=item TCP
+
+The connection will be always on tcp, the default port will be 47156.
+
+=item TLS
+
+TLS is mandatory for all connections, the TLS layer is the first thing
+to be stablished.
+
+=item Session
+
+The session defines the context for one specific database environment,
+the authentication happens in the session layer. Only one session
+exists per connection, so when the session is ended the connection is
+dropped.
+
+=item Request/Response
+
+During a session an user may send a request and the server will send a
+response, only one request is processed at a time and no other request
+will be received until the response is posted by the server. Note that
+future versions of the server might support async commands, but that
+won't change this behavior. The task acceptance should then return a
+response and wait for a request for the result. There is no support
+for server-push.
+
+=back
+
+=head1 Session Initiation
+
+=head2 Session header
+
+The first command the client must send is:
+
+  SESSION $environmentname VERSION $version\n
+
+This identifies the environment to which the client wants to connect
+to, as well as the client version of the protocol. The name of the
+environment must be composed by [A-Za-z0-9] characters only. The
+server will then respond with:
+
+  SERVER VERSION $version\n
+
+This will inform to the client the version the server implements. If
+the client has a version which is greater then the server, it should
+take care to only use commands available in that specific version. If
+the client has a version which is older then the server, it should be
+aware that any command it issue might be subject to deprecation.
+
+Note that even if the name of the environment is incorrect, or even
+illegal, the server should not give any additional information, but
+rather wait for the authentication information before taking any other
+measure.
+
+=head2 Session Authorization
+
+The next step is the client to send all credential informations to the
+server. There is no instrospection of the authentication mechanisms,
+the contract should be made by configuration in both the client and
+the server.
+
+The credentials should be sent to the server in the format of HTTP
+headers followed by a blank line. Each authentication module should
+define the keys it is looking for.
+
+The server will then return one of:
+
+  SESSION STARTING\n
+
+or
+
+  ACCESS DENIED\n
+
+In the event of access denied, the connection will be closed
+immediately by the server.
+
+=head2 Session Negotiation
+
+The client then will send all the session configuration options in the
+format of HTTP headers followed by a blank line. The keys and values
+are subject to the different plugins loaded by the server. The server
+should ignore any unknown headers.
+
+The response of the server will be the final session attributes,
+including only the effective ones, also in the HTTP headers format
+followed by a blank line.
+
+From this point on, the session is stablished and the client can start
+sending requests.
+
+=head1 Request/Response
+
+=head2 Request
+
+The server is always listening for requests. The request format is the
+same as HTTP. The command is sent as the resource and any additional
+parameter is sent as a HTTP header, followed by a blank line in the
+end. If the verb used is POST, it requires the use of a Content-length
+header which is then used as the base for reading the data.
+
+  GET $command\n
+  Attr1=Value1\n
+  Attr2=Value2\n
+  Attr3=Value3\n
+  \n
+
+or
+
+  POST $command\n
+  Content-length=$length\n
+  Attr1=Value1\n
+  Attr2=Value2\n
+  Attr3=Value3\n
+  \n
+  content here of $length size in bytes.
+
+=head2 Response
+
+The response is also 
