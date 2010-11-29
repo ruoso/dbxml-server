@@ -148,4 +148,33 @@ or
 
 =head2 Response
 
-The response is also 
+The response is also inspired in the HTTP protocol. It is in the
+following format:
+
+  $numeric_code $message\n
+  Content-length=$length\n
+  Attr1=Value1\n
+  Attr2=Value2\n
+  Attr3=Value3\n
+  \n
+  content here of $length size in bytes.
+
+If the header Content-length is missing, it means no data is
+available. Otherwise the response data has $length bytes. The numeric
+code is also inspired in the HTTP protocol.
+
+=over
+
+=item 1** Informational
+
+=item 2** Successfull
+
+=item 3** Redirection
+
+=item 4** Client Error
+
+=item 5** Server Error
+
+=back
+
+
