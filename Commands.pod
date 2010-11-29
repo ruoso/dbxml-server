@@ -141,11 +141,10 @@ The attributes for the createTransaction command are:
 
 =over
 
-=item flag
+=item flags
 
-You can send this attribute as many times as you want to set the
-flags. The possible values are the ones specified in the API. You
-should send the constant name documented in the API as string.
+This should be built using the constants in the db xml C++ API. Should
+be sent as the numeric value.
 
 =back
 
@@ -156,6 +155,46 @@ It returns:
 =item XmlTransaction-Id
 
 The session-specific id of this transaction.
+
+=back
+
+=head2 XmlManager::createContainer
+
+This creates a new container in the environment. It accepts the
+following attributes:
+
+=over
+
+=item XmlContainer-Name
+
+The name of the container.
+
+=item type
+
+This specifies the behavior of this container. It is either "node" or
+"wholedoc". Default is "node".
+
+=item flags
+
+This should be built using the constants in the db xml C++ API. Should
+be sent as the numeric value.
+
+=back
+
+
+=head2 XmlManager::deleteContainer
+
+Delete a container. Attributes are:
+
+=over
+
+=item XmlTransaction-Id
+
+This informs the transaction in which the query should be performed.
+
+=item XmlContainer-Name
+
+The name of the container.
 
 =back
 
@@ -177,11 +216,10 @@ session context is used.
 
 This informs the transaction in which the query should be performed.
 
-=item flag
+=item flags
 
-You can send this attribute as many times as you want to set the
-flags. The possible values are the ones specified in the API. You
-should send the constant name documented in the API as string.
+This should be built using the constants in the db xml C++ API. Should
+be sent as the numeric value.
 
 =back
 
@@ -235,11 +273,10 @@ Commits the given transaction. Attributes are:
 
 The id of this transaction
 
-=item flag
+=item flags
 
-You can send this attribute as many times as you want to set the
-flags. The possible values are the ones specified in the API. You
-should send the constant name documented in the API as string.
+This should be built using the constants in the db xml C++ API. Should
+be sent as the numeric value.
 
 =back
 
@@ -265,11 +302,10 @@ Creates a child transaction.
 
 The id of the parent transaction
 
-=item flag
+=item flags
 
-You can send this attribute as many times as you want to set the
-flags. The possible values are the ones specified in the API. You
-should send the constant name documented in the API as string.
+This should be built using the constants in the db xml C++ API. Should
+be sent as the numeric value.
 
 =back
 
@@ -282,3 +318,45 @@ It returns:
 The id of the child transaction
 
 =back
+
+=head2 XmlContainer::putDocument
+
+Loads a document inside a container, should be called as a POST with
+the xml data as the content. It receives the following attributes:
+
+=over
+
+=item XmlTransaction-Id
+
+This informs the transaction in which the query should be performed.
+
+=item XmlContainer-Name
+
+The name of the container.
+
+=item XmlDocument-Name
+
+The name of the document.
+
+=back
+
+=head2 XmlContainer::deleteDocument
+
+Delete a document from a container. Attributes are:
+
+=over
+
+=item XmlTransaction-Id
+
+This informs the transaction in which the query should be performed.
+
+=item XmlContainer-Name
+
+The name of the container.
+
+=item XmlDocument-Name
+
+The name of the document.
+
+=back
+
