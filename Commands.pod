@@ -1,0 +1,284 @@
+=head1 Command Server List
+
+This document describes the commands to be accepted by the server. See
+the db xml C++ api for more information.
+
+=head1 VERSION
+
+This is the version 0.001 of the Server, obeying to the Protocol
+version 0.001.
+
+=head1 Commands
+
+=head2 XmlValue
+
+This command creates a new xml value to be used later.
+
+The value should be sent as the POST value. The following attributes
+are expected.
+
+=over
+
+=item type
+
+This attribute specifies if a cast should be made to the value. The
+possible values are "string", "double", "bool", "xml", "qname".
+
+=item qnameNS
+
+When you set a "qname" type, you should also send the qname namespace.
+
+=item qnameName
+
+When you set a "qname" type, you should also send the qname name.
+
+=back
+
+The command will return the following attributes:
+
+=over
+
+=item XmlValue-Id
+
+This attribute returns the session specific id of this value.
+
+=back
+
+=head2 XmlValue::finish
+
+This deallocate the XmlValue from the session. The attributes received
+are:
+
+=over
+
+=item XmlValue-Id
+
+This identifies the value to be destroyed.
+
+=back
+
+=head2 XmlQueryContext
+
+This command creates a new query context to be used in queries later.
+
+The following attributes can be sent in this command:
+
+=over
+
+=item evaluationType
+
+This can be "eager" or "lazy".
+
+=item defaultCollection
+
+The value to be used in queries with no arguments in the function
+collection().
+
+=item queryTimeoutSeconds
+
+The number of seconds to timeout a query.
+
+=item baseURI
+
+Base URI for query expressions.
+
+=item namespace
+
+You can have more then one entry for this, in order to declare more
+than one namespace. The value should be "$prefix=$uri".
+
+=item variableValue
+
+You can have more then one entry for this, in order to declare more
+than one variable. The value should be "$name=$xml_value". $xml_value
+is interpreted as the "xml" values of XmlValue.
+
+=item variableValue-Id
+
+You can have more then one entry for this, in order to declare more
+than one variable. The value should be "$name=$xml_value_id"
+
+=item variableValue-Results
+
+You can have more then one entry for this, in order to declare more
+then one variable. It allows you to associate a previous result as a
+value. The value should be "$name=$xml_results_id"
+
+=back
+
+The recently-created XmlQueryContext will reside until the end of the
+session. This operation will return:
+
+=over
+
+=item XmlQueryContext-Id
+
+This identifies the XmlQueryContext session-specific id.
+
+=back
+
+=head2 XmlQueryContext::finish
+
+This method deallocates the XmlQueryContext from the session. Receives
+the following attribute:
+
+=over
+
+=item XmlQueryContext-Id
+
+This identifies the XmlQueryContext to be freed.
+
+=back
+
+=head2 XmlManager::createTransaction
+
+This command will initialize a new transaction. Note that different
+from regular databases, this does not imply that all queries in this
+session will be enclosed in this transaction. You need to explicitly
+inform the transaction in the query command.
+
+The attributes for the createTransaction command are:
+
+=over
+
+=item flag
+
+You can send this attribute as many times as you want to set the
+flags. The possible values are the ones specified in the API. You
+should send the constant name documented in the API as string.
+
+=back
+
+It returns:
+
+=over
+
+=item XmlTransaction-Id
+
+The session-specific id of this transaction.
+
+=back
+
+=head2 XmlManager::query
+
+This command executes a given query and will return the identification
+of the statement handle for you to fetch any return value. The query
+string should be passed as the POST content. The following attributes
+are accepted for the query command:
+
+=over
+
+=item XmlQueryContext-Id
+
+The query context to be used. If no context is provided, the default
+session context is used.
+
+=item XmlTransaction-Id
+
+This informs the transaction in which the query should be performed.
+
+=item flag
+
+You can send this attribute as many times as you want to set the
+flags. The possible values are the ones specified in the API. You
+should send the constant name documented in the API as string.
+
+=back
+
+The result of the query does not contain the return values, but rather
+the following attributes:
+
+=over
+
+=item XmlResults-Id
+
+This is a session-specific id that should be used to fetch the values
+of this query.
+
+=back
+
+=head2 XmlResults::next
+
+This command returns the next element of the XmlResults. The
+attributes sent to this command should be:
+
+=over
+
+=item XmlResults-Id
+
+This should inform the session-specific id of the XmlResults object.
+
+=back
+
+This command will return XML data, therefore the Content-length
+attribute is defined as expected.
+
+=head2 XmlResults::finish
+
+This command deallocates the XmlResults object in question.
+
+=over
+
+=item XmlResults-Id
+
+This should inform the session-specific id of the XmlResults object.
+
+=back
+
+=head2 XmlTransaction::commit
+
+Commits the given transaction. Attributes are:
+
+=over
+
+=item XmlTransaction-Id
+
+The id of this transaction
+
+=item flag
+
+You can send this attribute as many times as you want to set the
+flags. The possible values are the ones specified in the API. You
+should send the constant name documented in the API as string.
+
+=back
+
+=head2 XmlTransaction::abort
+
+Aborts the given transaction. Attributes are:
+
+=over
+
+=item XmlTransaction-Id
+
+The id of this transaction
+
+=back
+
+=head2 XmlTransaction::createChild
+
+Creates a child transaction.
+
+=over
+
+=item XmlTransaction-Id
+
+The id of the parent transaction
+
+=item flag
+
+You can send this attribute as many times as you want to set the
+flags. The possible values are the ones specified in the API. You
+should send the constant name documented in the API as string.
+
+=back
+
+It returns:
+
+=over
+
+=item XmlTransaction-Id
+
+The id of the child transaction
+
+=back
