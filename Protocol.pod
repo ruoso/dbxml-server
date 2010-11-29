@@ -146,6 +146,12 @@ or
   \n
   content here of $length size in bytes.
 
+If no headers are necessary for a given command, the client should
+just return a second newline, i.e.:
+
+  GET $command\n
+  \n
+
 =head2 Response
 
 The response is also inspired in the HTTP protocol. It is in the
