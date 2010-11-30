@@ -1,0 +1,50 @@
+=head1 Server Architecture
+
+This document describes the architecture of the server implementation.
+
+=head2 Components
+
+=over
+
+=item Main
+
+The main component is the glue that initializes all other components
+and glue them toguether. It is also responsible for reading the
+configuration files and sending the specific informations to each
+component.
+
+=item Authentication
+
+The authentication module is a global component that is consumed by
+different threads to authenticate the new sessions;
+
+=item Connection
+
+The connection manager is responsible for bind the socket into the
+configured host and port for new connections. When a new connection is
+received a new thread is initialized and the connection is handed to
+the encryption module. Once the encryption is stablished, the
+connection is handed to the Protocol module.
+
+=item Encryption
+
+Since TLS is mandatory for all connections, the encryption module will
+receive the connection and encapsulate the clear data through the
+secure channel.
+
+=item Protocol
+
+This module implements the handling of the protocol, both for the
+session initiation as for the request/response phase. It maintains the
+reference to the session, deserializes requests and serializes
+responses.
+
+=item Session
+
+The session module is responsible for the management of all
+session-specific data, the requests are called on it and it returns
+the results. It is the session that handles the DB_ENV as well as the
+XmlManager. The actual server commands are implemented in this
+component.
+
+=back
