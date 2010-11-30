@@ -3,14 +3,14 @@ CFLAGS=-Wall
 LDFLAGS=
 LIBS=
 
-SOURCES_MAIN = src/main/main.c
-ALL_SOURCES  = $(SOURCES_MAIN)
-ALL_OBJECTS  = $(ALL_SOURCES:.c=.o)
+SOURCES_MAIN = src/main/main.c src/main/options.c
+HEADERS_MAIN = src/main/main.h src/main/options.h
+OBJECTS_MAIN = $(SOURCES_MAIN:.c=.o)
 
-dbxml_server: $(ALL_OBJECTS)
-	$(CC) $(LDFLAGS) -o $@ $(ALL_OBJECTS) $(LIBS)
+dbxml_server: $(OBJECTS_MAIN)
+	$(CC) $(LDFLAGS) -o $@ $(OBJECTS_MAIN) $(LIBS)
 
-src/main/dbxml_server: src/main/dbxml_server.o
+$(OBJECTS_MAIN): $(HEADERS_MAIN)
 
 clean:
-	rm -fv dbxml_server $(ALL_OBJECTS)
+	rm -fv dbxml_server $(OBJECTS_MAIN)
