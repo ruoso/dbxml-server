@@ -78,6 +78,9 @@ void bind_server(DbXmlServerOptions *options) {
         fprintf(stderr, "Error in accept: %s\n", strerror(errno));
       }
     }
+
+    // let's close the socket
+    close(socket_fd);
   }
   if (!bound) {
     fprintf(stderr, "Could not bind to any address.\n");
