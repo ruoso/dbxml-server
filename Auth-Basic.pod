@@ -1,0 +1,27 @@
+=head1 Authentication - Basic
+
+This document covers the basic authentication.
+
+=head2 Credentials
+
+The credentials to be sent as attributes in the session authorization
+are:
+
+=over
+
+=item user
+
+The user login name.
+
+=item password
+
+The password for this user.
+
+=back
+
+=head2 Store
+
+The user database will be stored in the htpasswd format, in the file
+"auth-basic.htpasswd" in the environment home, therefore it is
+specific to each environment.
+
