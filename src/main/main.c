@@ -1,5 +1,6 @@
 #include "main.h"
 #include "options.h"
+#include "../conn/bind.h"
 
 int main(int argc, char* argv[]) {
 
@@ -9,7 +10,8 @@ int main(int argc, char* argv[]) {
 
   // TODO: initialize authentication
 
-  
+  // delegate to the connection module
+  bind_server(&options);
 
   return 1;
 }

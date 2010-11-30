@@ -7,10 +7,18 @@ SOURCES_MAIN = src/main/main.c src/main/options.c
 HEADERS_MAIN = src/main/main.h src/main/options.h
 OBJECTS_MAIN = $(SOURCES_MAIN:.c=.o)
 
-dbxml_server: $(OBJECTS_MAIN)
-	$(CC) $(LDFLAGS) -o $@ $(OBJECTS_MAIN) $(LIBS)
+SOURCES_CONN = src/conn/bind.c
+HEADERS_CONN = src/conn/bind.h
+OBJECTS_CONN = $(SOURCES_CONN:.c=.o)
 
-$(OBJECTS_MAIN): $(HEADERS_MAIN)
+ALL_OBJECTS  = $(OBJECTS_MAIN) $(OBJECTS_CONN)
+
+dbxml_server: $(ALL_OBJECTS)
+	$(CC) $(LDFLAGS) -o $@ $(ALL_OBJECTS) $(LIBS)
+
+$(ALL_OBJECTS): $(HEADERS_MAIN)
+
+$(OBJECTS_MAIN): $(HEADERS_CONN)
 
 clean:
-	rm -fv dbxml_server $(OBJECTS_MAIN)
+	rm -fv dbxml_server $(ALL_OBJECTS)

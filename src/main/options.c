@@ -1,3 +1,4 @@
+#include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -11,7 +12,7 @@ void parse_options(int argc, char* argv[], DbXmlServerOptions* ret) {
   // default values
   ret->Authentication.module = "basic";
   ret->Main.server_home = ".";
-  char* bind_address = "127.0.0.1";
+  char* bind_address = "0";
   char* bind_port = "47156";
 
   // getopt parsing...
@@ -39,7 +40,10 @@ void parse_options(int argc, char* argv[], DbXmlServerOptions* ret) {
   // TODO: parse config file.
 
   // resolve bind args to addrinfo
-  int s = getaddrinfo(bind_address, bind_port, NULL, &(ret->Connection.addrinfo));
+  struct addrinfo hints;
+  memset(&hints, 0, sizeof(struct addrinfo));
+  hints.ai_socktype = SOCK_STREAM;
+  int s = getaddrinfo(bind_address, bind_port, &hints, &(ret->Connection.addrinfo));
   if (s != 0) {
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
     exit(EXIT_FAILURE);
