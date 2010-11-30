@@ -73,7 +73,11 @@ void bind_server(DbXmlServerOptions *options) {
         } else {
           fprintf(stderr, "Client connected %d\n", peer_addr_size);
         }
+
+        // as it is understood that this might open a new thread, this function
+        // won't close the client_fd. handle_client should do it.
         handle_client(client_fd, &peer_addr, peer_addr_size, options);
+
       } else {
         fprintf(stderr, "Error in accept: %s\n", strerror(errno));
       }
