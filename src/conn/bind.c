@@ -1,11 +1,13 @@
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
 #include "../main/options.h"
 #include "bind.h"
+#include "handle_client.h"
 
 #define MAX_CHARS_ADDR 1025
 
@@ -18,9 +20,10 @@ void bind_server(DbXmlServerOptions *options) {
     int socket_fd;
     socket_fd = socket(addrinfo->ai_family, addrinfo->ai_socktype, 0);
     if (socket_fd == -1) {
-      fprintf(stderr, "Error creating socket (%d, %d): %s",
+      fprintf(stderr, "Error creating socket (%d, %d): %s\n",
               addrinfo->ai_family, addrinfo->ai_socktype,
               strerror(errno));
+      addrinfo = addrinfo->ai_next;
       continue;
     }
 
@@ -37,15 +40,47 @@ void bind_server(DbXmlServerOptions *options) {
     // bind to the address
     int res = bind(socket_fd, addrinfo->ai_addr, addrinfo->ai_addrlen);
     if (res != 0) {
-      fprintf(stderr, "Error binding to address %s:%s - %s",
+      fprintf(stderr, "Error binding to address %s:%s - %s\n",
               printable_host, printable_port,
               strerror(errno));
+      addrinfo = addrinfo->ai_next;
+      close(socket_fd);
       continue;
-    } else {
-      fprintf(stderr, "Binding to %s:%s\n", printable_host, printable_port);
     }
 
+    // listen on the socket
+    if (listen(socket_fd, 10) != 0) {
+      fprintf(stderr, "Error listening to socket, trying next address.\n");
+      addrinfo = addrinfo->ai_next;
+      close(socket_fd);
+      continue;
+    }
 
-    addrinfo = addrinfo->ai_next;
+    // From this point on, we assume to have a valid connection
+    bound = 1;
+    fprintf(stderr, "Listening to %s:%s\n", printable_host, printable_port);
+
+    int client_fd = 0;
+    struct sockaddr peer_addr;
+    socklen_t peer_addr_size = sizeof(struct sockaddr);
+    while ((client_fd = accept(socket_fd, &peer_addr, &peer_addr_size))) {
+      if (client_fd >= 0) {
+        if (getnameinfo(&peer_addr, peer_addr_size,
+                        printable_host, MAX_CHARS_ADDR-1,
+                        printable_port, MAX_CHARS_ADDR-1,
+                        NI_NUMERICHOST | NI_NUMERICSERV) == 0) {
+          fprintf(stderr, "Client %s:%s connected\n", printable_host, printable_port);
+        } else {
+          fprintf(stderr, "Client connected %d\n", peer_addr_size);
+        }
+        handle_client(client_fd, &peer_addr, peer_addr_size, options);
+      } else {
+        fprintf(stderr, "Error in accept: %s\n", strerror(errno));
+      }
+    }
+  }
+  if (!bound) {
+    fprintf(stderr, "Could not bind to any address.\n");
+    exit(-1);
   }
 }
