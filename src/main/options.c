@@ -29,10 +29,10 @@ void parse_options(int argc, char* argv[], DbXmlServerOptions* ret) {
       ret->Main.server_home = optarg;
       break;
     case 'c':
-      fprintf(stderr, "Parsing of configuration files not yet implemented\n");
+      LOG_ERROR("Parsing of configuration files not yet implemented\n");
     default: /* '?' */
-      fprintf(stderr, "Usage: %s [-h bindaddress][-p bindport][-d dir][-c config]\n",
-              argv[0]);
+      LOG_ERROR("Usage: %s [-h bindaddress][-p bindport][-d dir][-c config]\n",
+                argv[0]);
       exit(-1);
     }
   }
@@ -45,7 +45,7 @@ void parse_options(int argc, char* argv[], DbXmlServerOptions* ret) {
   hints.ai_socktype = SOCK_STREAM;
   int s = getaddrinfo(bind_address, bind_port, &hints, &(ret->Connection.addrinfo));
   if (s != 0) {
-    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
+    LOG_ERROR("getaddrinfo: %s\n", gai_strerror(s));
     exit(EXIT_FAILURE);
   }
 

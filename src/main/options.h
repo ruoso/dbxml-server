@@ -4,6 +4,12 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <stdio.h>
+
+#define LOG(type, args...) fprintf(stderr, "[%s] ", type); fprintf(stderr, ## args);
+#define LOG_DEBUG(args...) LOG("DEBUG", ## args);
+#define LOG_INFO(args...)  LOG("INFO", ## args);
+#define LOG_ERROR(args...) LOG("ERROR", ## args);
 
 typedef struct DbXmlServerOptions {
   struct {

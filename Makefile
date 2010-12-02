@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS=-Wall
-LDFLAGS=
+CFLAGS=-Wall -pthread
+LDFLAGS=-pthread
 LIBS=
 
 SOURCES_MAIN = src/main/main.c src/main/options.c
