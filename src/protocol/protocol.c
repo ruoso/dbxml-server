@@ -31,6 +31,29 @@
     p -= r;                                                           \
   }
 
+#define READLINE                                                \
+  while (strchr(buffer, '\n') == NULL) {                        \
+    READDATA(session, auxbuffer, MAX_BUF);                      \
+    if ((bufpos + r) < MAX_BUF) {                               \
+      LOG_DEBUG("Read %d,%d bytes.\n", r,bufpos);               \
+      memcpy((char*)((int)&buffer + bufpos), auxbuffer, r);     \
+      LOG_DEBUG("BUFFER: !!!%s!!!\n", buffer);                  \
+      bufpos += r;                                              \
+    } else {                                                    \
+      LOG_ERROR("Exceeded buffer size. Giving up.\n");          \
+      return;                                                   \
+    }                                                           \
+  }
+ 
+#define CONSUME_LINE                                    \
+  scanf_stop = strchr(buffer, '\n');                    \
+  remaining = bufpos - (scanf_stop - buffer - 1);       \
+  memset(&auxbuffer, 0, MAX_BUF + 1);                   \
+  memcpy(&auxbuffer, scanf_stop + 1, remaining);        \
+  memset(&buffer, 0, MAX_BUF + 1);                      \
+  memcpy(&buffer, auxbuffer, remaining);                \
+  bufpos = remaining - 2;                               \
+  // 1 for the newline, and 1 for the NULL in the end.
 
 void protocol_start_session(DbXmlSessionData *session) {
   int r, p;
@@ -40,42 +63,42 @@ void protocol_start_session(DbXmlSessionData *session) {
   // know for sure the string is 0 terminated.
   char buffer[MAX_BUF + 1];
   char auxbuffer[MAX_BUF + 1];
+  int bufpos = 0;
   int remaining = 0;
   char* scanf_stop = NULL;
-
-  int bufpos = 0;
   memset(&buffer, 0, MAX_BUF + 1);
   memset(&auxbuffer, 0, MAX_BUF + 1);
 
   // first thing to expect is: 
   // SESSION $envname VERSION $version\n
-  while (strchr(buffer, '\n') == NULL) {
-    READDATA(session, auxbuffer, MAX_BUF);
-    if ((bufpos + r) < MAX_BUF) {
-      memcpy((char*)((int)&buffer + bufpos), &auxbuffer, r);
-      bufpos += r;
-    } else {
-      LOG_ERROR("Exceeded buffer size. Giving up.\n");
-      return;
-    }
-  }
+  READLINE;
+
   if (sscanf(buffer, "SESSION %255s VERSION %f\n",
              session->Session.env_name,
              &(session->Session.client_version)) != 2) {
     LOG_INFO("Client sent bad data (%s)", buffer);
     return;
   }
-
-  // we need to avoid loosing any data after the first command
-  scanf_stop = strchr(buffer, '\n');
-  remaining = bufpos - (scanf_stop - buffer);
-  memcpy(&auxbuffer, scanf_stop, remaining);
-  memcpy(&buffer, auxbuffer, remaining);
-  bufpos = remaining;
+  
+  CONSUME_LINE;
   
   // now we send the server version
-  WRITEDATA(session, "SERVER VERSION 0.001\n", 22);
+  WRITEDATA(session, "SERVER VERSION 0.001\n", 21);
 
+  // now we need to receive the credentials.
+  for (;;) {
+    READLINE;
+
+    // TODO: receive the credentials.
+    
+    // after the last credential, we receive a blank line
+    if (buffer[0] == '\n') {
+      break;
+    }
+
+    CONSUME_LINE;
+  }
+  
 }
 
 
