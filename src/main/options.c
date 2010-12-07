@@ -14,6 +14,10 @@ void parse_options(int argc, char* argv[], DbXmlServerOptions* ret) {
   ret->Main.server_home = ".";
   char* bind_address = "0";
   char* bind_port = "47156";
+  strcpy(ret->Encryption.keyfile, "server.key");
+  strcpy(ret->Encryption.certfile, "server.pem");
+  strcpy(ret->Encryption.cafile, "");
+  strcpy(ret->Encryption.crlfile, "");
 
   // getopt parsing...
   int opt = 0;
