@@ -35,5 +35,6 @@ typedef struct DbXmlServerOptions {
 } DbXmlServerOptions;
 
 void parse_options(int argc, char* argv[], DbXmlServerOptions* ret);
+void free_options(DbXmlServerOptions* ret);
 
 #endif

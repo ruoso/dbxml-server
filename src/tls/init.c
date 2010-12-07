@@ -47,3 +47,13 @@ void tls_init(DbXmlServerOptions *options) {
   }
 
 }
+
+void tls_deinit(DbXmlServerOptions *options) {
+  
+  gnutls_certificate_free_credentials (options->Encryption.x509_cred);
+  gnutls_priority_deinit (options->Encryption.priority_cache);
+
+  gnutls_global_deinit ();
+
+
+}

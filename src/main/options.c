@@ -55,3 +55,9 @@ void parse_options(int argc, char* argv[], DbXmlServerOptions* ret) {
 
   
 }
+
+
+void free_options(DbXmlServerOptions *options) {
+  freeaddrinfo(options->Connection.addrinfo);
+  options->Connection.addrinfo = NULL;
+}

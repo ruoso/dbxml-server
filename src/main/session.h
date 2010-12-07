@@ -13,6 +13,10 @@ typedef struct DbXmlSessionData {
   struct {
     gnutls_session_t session;
   } Encryption;
+  struct {
+    char env_name[256];
+    float client_version;
+  } Session;
 } DbXmlSessionData;
 
 

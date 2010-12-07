@@ -19,6 +19,10 @@ int main(int argc, char* argv[]) {
   // delegate to the connection module
   bind_server(&options);
 
-  return 1;
+  tls_deinit(&options);
+
+  free_options(&options);
+
+  return 0;
 }
 
