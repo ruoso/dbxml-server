@@ -15,9 +15,6 @@ void handle_session(DbXmlSessionData *session) {
   gnutls_certificate_server_set_request(session->Encryption.session,
                                         GNUTLS_CERT_REQUEST);
 
-  gnutls_session_enable_compatibility_mode(session->Encryption.session);
- 
-
   gnutls_transport_set_ptr(session->Encryption.session,
                            (gnutls_transport_ptr_t)(session->Connection.client_fd));
 
