@@ -5,8 +5,6 @@
 #include <pthread.h>
 GCRY_THREAD_OPTION_PTHREAD_IMPL;
 
-#define X509 (options->Encryption.x509_cred)
-
 void tls_init(DbXmlServerOptions *options) {
   gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
   gnutls_global_init();
@@ -43,7 +41,8 @@ void tls_init(DbXmlServerOptions *options) {
                                              options->Encryption.certfile,
                                              GNUTLS_X509_FMT_PEM);
   if (ret != GNUTLS_E_SUCCESS) {
-    LOG_ERROR("Failed to process server key '%s', '%s' (%d)\n", options->Encryption.certfile, options->Encryption.keyfile, ret);
+    LOG_ERROR("Failed to process server key '%s', cert '%s' (%d)\n",
+              options->Encryption.certfile, options->Encryption.keyfile, ret);
     exit(-1);
   }
 

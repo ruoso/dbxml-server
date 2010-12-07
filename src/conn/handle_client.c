@@ -24,6 +24,7 @@ void* thread_handler(void *a) {
   handle_session(args);
 
   LOG_INFO("Client %s:%s disconnected\n", printable_host, printable_port);
+  args->options = NULL;
   free(args);
   close(args->Connection.client_fd);
   return NULL;

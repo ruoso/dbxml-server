@@ -10,6 +10,9 @@ typedef struct DbXmlSessionData {
     socklen_t peer_addr_len;
     int client_fd;
   } Connection;
+  struct {
+    gnutls_session_t session;
+  } Encryption;
 } DbXmlSessionData;
 
 
