@@ -1,10 +1,11 @@
 #include <strings.h>
+#include <stdlib.h>
 #include <string.h>
 #include "../main/session.h"
 #include "protocol.h"
 #include "../tls/io.h"
 
-#define MAX_BUF 1024
+#define MAX_BUF 1023
 
 #define READDATA(session,buffer,size)                           \
   r = tls_read(session,buffer,size);                            \
@@ -17,18 +18,19 @@
     return;                                                     \
   }
   
-#define WRITEDATA(session,buffer,size)                                \
-  p = size;                                                           \
-  while ((p > 0) && (r = tls_write(session,buffer+(size-p),p))) {     \
-    if (r == 0) {                                                     \
-      /* client closed connection */                                  \
-      return;                                                         \
-    } else if (r < 0) {                                               \
-      /* corrupt data */                                              \
-      LOG_ERROR("*** error sending data(%d)\n", r);                   \
-      return;                                                         \
-    }                                                                 \
-    p -= r;                                                           \
+#define WRITEDATA(session,buffer,size)                          \
+  p = size;                                                     \
+  while ((p > 0) &&                                             \
+         (r = tls_write(session,buffer+(size-p),p))) {          \
+    if (r == 0) {                                               \
+      /* client closed connection */                            \
+      return;                                                   \
+    } else if (r < 0) {                                         \
+      /* corrupt data */                                        \
+      LOG_ERROR("*** error sending data(%d)\n", r);             \
+      return;                                                   \
+    }                                                           \
+    p -= r;                                                     \
   }
 
 #define READLINE                                                \
@@ -53,8 +55,30 @@
   memset(&buffer, 0, MAX_BUF + 1);                              \
   linesize = bufpos - remaining;                                \
   LOG_DEBUG("LINE: (%d) !!!%s!!!\n", linesize, line);           \
-  bufpos = 0;                                                   \
-  // 1 for the newline, and 1 for the NULL in the end.
+  bufpos = 0;
+
+#define PARSEHEADER                                             \
+  memset(header, 0, sizeof(DbXmlHeader));                       \
+  scanf_stop = strchr(line, '=');                               \
+  if (scanf_stop == NULL) {                                     \
+    LOG_ERROR("received corrupt header: !!!%s!!!", line);       \
+    return;                                                     \
+  }                                                             \
+  int keysize = scanf_stop - line;                              \
+  int valsize = linesize - keysize - 1;                         \
+  if (keysize >= MAX_TOKEN_SIZE ||                              \
+      valsize >= MAX_TOKEN_SIZE) {                              \
+    LOG_ERROR("header key or value too long.");                 \
+    return;                                                     \
+  }                                                             \
+  LOG_DEBUG("HEADER SIZES: %d = 1 + %d + %d\n",                 \
+            linesize, keysize, valsize)                         \
+  memcpy(&(header->key), line, keysize);                        \
+  LOG_DEBUG("HEADER: KEY ``%s''\n",                             \
+            header->key);                                       \
+  memcpy(&(header->val), line + keysize + 1, valsize);          \
+  LOG_DEBUG("HEADER: VAL ``%s''\n",                             \
+            header->val);
 
 void protocol_start_session(DbXmlSessionData *session) {
   int r, p;
@@ -68,6 +92,7 @@ void protocol_start_session(DbXmlSessionData *session) {
   int bufpos = 0;
   int linesize = 0;
   int remaining = 0;
+  int header_count = 0;
   char* scanf_stop = NULL;
   memset(&line, 0, MAX_BUF + 1);
   memset(&buffer, 0, MAX_BUF + 1);
@@ -87,15 +112,31 @@ void protocol_start_session(DbXmlSessionData *session) {
   WRITEDATA(session, "SERVER VERSION 0.001\n", 21);
 
   // now we need to receive the credentials.
+  DbXmlCredentials* cred = malloc(sizeof(DbXmlCredentials));
+  memset(cred, 0, sizeof(DbXmlCredentials));
+  header_count = 0;
   for (;;) {
     READLINE;
-
-    // TODO: receive the credentials.
-    
     // after the last credential, we receive a blank line
-    if (line[0] == 0) {
+    if (line[0] == 0)
       break;
+
+    // refuse more then MAX_HEADERS headers.
+    if (header_count == MAX_HEADERS) {
+      LOG_ERROR("received too many credentials");
+      return;
     }
+
+    // receive the credentials.
+    DbXmlHeader* header = malloc(sizeof(DbXmlHeader));
+    if (header == NULL) {
+      LOG_ERROR("Failed to allocate header memory.\n");
+      return;
+    }
+      
+    PARSEHEADER;
+    
+    cred->headers[header_count++] = header;
   }
 
   // TODO: check if this environment exists and authenticate

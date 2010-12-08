@@ -1,29 +1,29 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 
+#define MAX_TOKEN_SIZE 255
+#define MAX_HEADERS 50
+
 typedef struct DbXmlHeader {
-  char key[255];
-  char val[255];
+  char key[MAX_TOKEN_SIZE];
+  char val[MAX_TOKEN_SIZE];
 } DbXmlHeader;
 
 typedef struct DbXmlCredentials {
-  int headers_count;
-  DbXmlHeader** headers;
+  DbXmlHeader* headers[50];
 } DbXmlCredentials;
 
 typedef struct DbXmlRequest {
-  char method[255];
-  char command[255];
-  int headers_count;
-  DbXmlHeader** headers;
+  char method[MAX_TOKEN_SIZE];
+  char command[MAX_TOKEN_SIZE];
+  DbXmlHeader* headers[MAX_HEADERS];
   int body_size;
 } DbXmlRequest;
 
 typedef struct DbXmlResponse {
   int code;
-  char message[255];
-  int headers_count;
-  DbXmlHeader** headers;
+  char message[MAX_TOKEN_SIZE];
+  DbXmlHeader* headers[MAX_HEADERS];
   int body_size;
 } DbXmlResponse;
 
