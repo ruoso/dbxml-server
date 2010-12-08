@@ -15,8 +15,8 @@ SOURCES_TLS  = src/tls/start.c src/tls/init.c src/tls/io.c
 HEADERS_TLS  = src/tls/start.h src/tls/init.h src/tls/io.h
 OBJECTS_TLS  = $(SOURCES_TLS:.c=.o)
 
-SOURCES_PROT  = src/protocol/protocol.c
-HEADERS_PROT  = src/protocol/protocol.h
+SOURCES_PROT  = src/protocol/start.c src/protocol/reqres.c
+HEADERS_PROT  = src/protocol/protocol.h src/protocol/io.h
 OBJECTS_PROT  = $(SOURCES_PROT:.c=.o)
 
 ALL_OBJECTS  = $(OBJECTS_MAIN) $(OBJECTS_CONN) $(OBJECTS_TLS) $(OBJECTS_PROT)

@@ -32,5 +32,6 @@ typedef struct DbXmlResponse {
 } DbXmlResponse;
 
 void protocol_start_session(DbXmlSessionData *session);
+void protocol_request_response(DbXmlSessionData *session);
 
 #endif

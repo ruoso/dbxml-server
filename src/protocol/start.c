@@ -140,11 +140,6 @@ int free_session_options(DbXmlSessionData* session, DbXmlSessionOptions* options
   return 0;
 }
 
-int request_response_mode(DbXmlSessionData* session) {
-  // TODO
-  return 0;
-}
-
 int free_session(DbXmlSessionData* session) {
   // TODO
   return 0;
@@ -185,7 +180,7 @@ void protocol_start_session(DbXmlSessionData *session) {
   free_session_options(session, &options);
 
   if (r == 0)
-    request_response_mode(session);
+    protocol_request_response(session);
   
   free_session(session);
   
