@@ -10,8 +10,12 @@ typedef struct DbXmlHeader {
 } DbXmlHeader;
 
 typedef struct DbXmlCredentials {
-  DbXmlHeader* headers[50];
+  DbXmlHeader* headers[MAX_HEADERS];
 } DbXmlCredentials;
+
+typedef struct DbXmlSessionOptions {
+  DbXmlHeader* headers[MAX_HEADERS];
+} DbXmlSessionOptions;
 
 typedef struct DbXmlRequest {
   char method[MAX_TOKEN_SIZE];
