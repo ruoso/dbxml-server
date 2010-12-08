@@ -176,18 +176,20 @@ void protocol_start_session(DbXmlSessionData *session) {
   
   free_credentials(session, &cred);
 
+  int init = -1;
   if (r == 0)
-    r = initialize_session(session);
+    init = r = initialize_session(session);
 
-  if (session_response(session, r) != 0)
+  if (session_response(session, r) != 0) {
+    free_session(session);
     return;
+  }
 
   r = receive_session_options(session, &options);
 
   options_set = NULL;
-  int init = -1;
   if (r == 0)
-    init = r = initialize_session_options(session, &options, &options_set);
+    r = initialize_session_options(session, &options, &options_set);
   
   if (r == 0)
     r = send_session_options(session, options_set);
