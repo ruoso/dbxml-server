@@ -3,4 +3,14 @@ Berkeley DB XML database. The importance of this application is to
 centralize the access to the BerkeleyDB environment, since it's just a
 library.
 
+What is implemented already?
 
+  * multi-thread connection handling
+  * TLS negotiation
+  * network protocol
+
+What is missing?
+
+  * Authentication
+  * The actual session handling
+  * The actual commands
