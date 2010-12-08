@@ -72,10 +72,6 @@ int free_credentials(DbXmlSessionData* session, DbXmlCredentials* cred) {
   return 0;
 }
 
-int initialize_session(DbXmlSessionData* session) {
-  return 0;
-}
-
 int session_response(DbXmlSessionData* session, int res) {
 
   WRITEDATAVARS;
@@ -94,7 +90,6 @@ int receive_session_options(DbXmlSessionData* session, DbXmlSessionOptions* opti
   PARSEHEADERVARS;
 
   // session negotiation
-  // now we need to receive the credentials.
   int header_count = 0;
   for (;;) {
     READLINE;
@@ -119,7 +114,7 @@ int receive_session_options(DbXmlSessionData* session, DbXmlSessionOptions* opti
   return 0;
 }
 
-int initialize_session_options(DbXmlSessionData* session, DbXmlSessionOptions* options, DbXmlSessionOptions** ret) {
+int initialize_session(DbXmlSessionData* session, DbXmlSessionOptions* options, DbXmlSessionOptions** ret) {
   // TODO: proper initialization. Just echoes for now.
   *ret = options;
   return 0;
@@ -176,18 +171,17 @@ void protocol_start_session(DbXmlSessionData *session) {
   
   free_credentials(session, &cred);
 
-  int init = -1;
-  if (r == 0)
-    init = r = initialize_session(session);
-
-  if (session_response(session, r) != 0)
-    return;
-
   r = receive_session_options(session, &options);
 
+  int init = -1;
   options_set = NULL;
   if (r == 0)
-    r = initialize_session_options(session, &options, &options_set);
+    init = r = initialize_session(session, &options, &options_set);
+
+  session_response(session, r);
+
+  if (r != 0)
+    return;
   
   if (r == 0)
     r = send_session_options(session, options_set);

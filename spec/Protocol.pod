@@ -95,6 +95,14 @@ The credentials should be sent to the server in the format of HTTP
 headers followed by a blank line. Each authentication module should
 define the keys it is looking for.
 
+=head2 Session Negotiation
+
+After all credentials are sent, the client then will send all the
+session configuration options in the format of HTTP headers followed
+by a blank line. The keys and values are subject to the different
+plugins loaded by the server. The server should ignore any unknown
+headers.
+
 The server will then return one of:
 
   SESSION STARTING\n
@@ -104,18 +112,9 @@ or
   ACCESS DENIED\n
 
 In the event of access denied, the connection will be closed
-immediately by the server.
-
-=head2 Session Negotiation
-
-The client then will send all the session configuration options in the
-format of HTTP headers followed by a blank line. The keys and values
-are subject to the different plugins loaded by the server. The server
-should ignore any unknown headers.
-
-The response of the server will be the final session attributes,
-including only the effective ones, also in the HTTP headers format
-followed by a blank line.
+immediately by the server. Otherwise it will return the final session
+attributes, including only the effective ones, also in the HTTP
+headers format followed by a blank line.
 
 From this point on, the session is stablished and the client can start
 sending requests.
