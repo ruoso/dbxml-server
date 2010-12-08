@@ -140,7 +140,8 @@ int send_session_options(DbXmlSessionData* session, DbXmlSessionOptions* options
 
 int free_session_options(DbXmlSessionData* session, DbXmlSessionOptions* options) {
   int header_count = MAX_HEADERS;
-  while (--header_count) {
+  while (header_count) {
+    header_count--;
     if (options->headers[header_count])
       free(options->headers[header_count]);
   }
