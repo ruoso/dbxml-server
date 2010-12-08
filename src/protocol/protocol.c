@@ -43,16 +43,17 @@
       LOG_ERROR("Exceeded buffer size. Giving up.\n");          \
       return;                                                   \
     }                                                           \
-  }
- 
-#define CONSUME_LINE                                    \
-  scanf_stop = strchr(buffer, '\n');                    \
-  remaining = bufpos - (scanf_stop - buffer - 1);       \
-  memset(&auxbuffer, 0, MAX_BUF + 1);                   \
-  memcpy(&auxbuffer, scanf_stop + 1, remaining);        \
-  memset(&buffer, 0, MAX_BUF + 1);                      \
-  memcpy(&buffer, auxbuffer, remaining);                \
-  bufpos = remaining - 2;                               \
+  }                                                             \
+  scanf_stop = strchr(buffer, '\n');                            \
+  remaining = bufpos - (scanf_stop - buffer);                   \
+  memset(&line, 0, MAX_BUF + 1);                                \
+  memcpy(&line, buffer, bufpos - remaining);                    \
+  memset(&auxbuffer, 0, MAX_BUF + 1);                           \
+  memcpy(&auxbuffer, scanf_stop + 1, remaining);                \
+  memset(&buffer, 0, MAX_BUF + 1);                              \
+  linesize = bufpos - remaining;                                \
+  LOG_DEBUG("LINE: (%d) !!!%s!!!\n", linesize, line);           \
+  bufpos = 0;                                                   \
   // 1 for the newline, and 1 for the NULL in the end.
 
 void protocol_start_session(DbXmlSessionData *session) {
@@ -61,26 +62,26 @@ void protocol_start_session(DbXmlSessionData *session) {
   // we need to leave the last byte for the NULL char
   // noone will set more then MAX_BUF on the string, so we
   // know for sure the string is 0 terminated.
+  char line[MAX_BUF + 1];
   char buffer[MAX_BUF + 1];
   char auxbuffer[MAX_BUF + 1];
   int bufpos = 0;
+  int linesize = 0;
   int remaining = 0;
   char* scanf_stop = NULL;
+  memset(&line, 0, MAX_BUF + 1);
   memset(&buffer, 0, MAX_BUF + 1);
   memset(&auxbuffer, 0, MAX_BUF + 1);
 
   // first thing to expect is: 
   // SESSION $envname VERSION $version\n
   READLINE;
-
-  if (sscanf(buffer, "SESSION %255s VERSION %f\n",
+  if (sscanf(line, "SESSION %255s VERSION %f",
              session->Session.env_name,
              &(session->Session.client_version)) != 2) {
-    LOG_INFO("Client sent bad data (%s)", buffer);
+    LOG_INFO("Client sent bad data (%s)\n", line);
     return;
   }
-  
-  CONSUME_LINE;
   
   // now we send the server version
   WRITEDATA(session, "SERVER VERSION 0.001\n", 21);
@@ -92,16 +93,19 @@ void protocol_start_session(DbXmlSessionData *session) {
     // TODO: receive the credentials.
     
     // after the last credential, we receive a blank line
-    if (buffer[0] == '\n') {
+    if (line[0] == 0) {
       break;
     }
-
-    CONSUME_LINE;
   }
-  
-}
 
+  // TODO: check if this environment exists and authenticate
+  WRITEDATA(session, "SESSION STARTING\n", 17);
 
-void protocol_session(DbXmlSessionData *session) {
+  // expect for commands
+  for (;;) {
+    READLINE;
+    
+    
+  }
 
 }
