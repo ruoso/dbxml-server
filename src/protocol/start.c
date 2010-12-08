@@ -107,7 +107,6 @@ int receive_session_options(DbXmlSessionData* session, DbXmlSessionOptions* opti
       return -1;
     }
 
-    // receive the credentials.
     DbXmlHeader* header = malloc(sizeof(DbXmlHeader));
     if (header == NULL) {
       LOG_ERROR("Failed to allocate header memory.\n");
@@ -121,19 +120,32 @@ int receive_session_options(DbXmlSessionData* session, DbXmlSessionOptions* opti
 }
 
 int initialize_session_options(DbXmlSessionData* session, DbXmlSessionOptions* options, DbXmlSessionOptions** ret) {
-  // TODO
+  // TODO: proper initialization. Just echoes for now.
+  *ret = options;
   return 0;
 }
 
 int send_session_options(DbXmlSessionData* session, DbXmlSessionOptions* options) {
-  // TODO
+  WRITEDATAVARS;
+  int header_count = 0;
+  while (header_count < MAX_HEADERS && options->headers[header_count] != NULL) {
+    WRITEDATA(session,
+              options->headers[header_count]->key,
+              strlen(options->headers[header_count]->key));
+    WRITEDATA(session, "=", 1);
+    WRITEDATA(session,
+              options->headers[header_count]->val,
+              strlen(options->headers[header_count]->val));
+    WRITEDATA(session, "\n", 1);
+    header_count++;
+  }
+  WRITEDATA(session, "\n", 1);
   return 0;
 }
 
 int free_session_options(DbXmlSessionData* session, DbXmlSessionOptions* options) {
   int header_count = MAX_HEADERS;
-  while (header_count) {
-    header_count--;
+  while (--header_count) {
     if (options->headers[header_count])
       free(options->headers[header_count]);
   }
@@ -151,6 +163,8 @@ void protocol_start_session(DbXmlSessionData *session) {
   DbXmlCredentials cred;
   DbXmlSessionOptions options;
   DbXmlSessionOptions *options_set;
+  memset(&cred, 0, sizeof(DbXmlCredentials));
+  memset(&options, 0, sizeof(DbXmlSessionOptions));
 
   if (initial_handshake(session) != 0)
     return;
@@ -171,8 +185,9 @@ void protocol_start_session(DbXmlSessionData *session) {
   r = receive_session_options(session, &options);
 
   options_set = NULL;
+  int init = -1;
   if (r == 0)
-    r = initialize_session_options(session, &options, &options_set);
+    init = r = initialize_session_options(session, &options, &options_set);
   
   if (r == 0)
     r = send_session_options(session, options_set);
@@ -182,7 +197,8 @@ void protocol_start_session(DbXmlSessionData *session) {
   if (r == 0)
     protocol_request_response(session);
   
-  free_session(session);
+  if (init == 0)
+    free_session(session);
   
 }
 
