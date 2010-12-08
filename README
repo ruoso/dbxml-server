@@ -11,6 +11,8 @@ What is implemented already?
 
 What is missing?
 
+  * Config-file parsing
   * Authentication
   * The actual session handling
   * The actual commands
+
