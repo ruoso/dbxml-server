@@ -184,7 +184,8 @@ void protocol_start_session(DbXmlSessionData *session) {
 
   free_session_options(session, &options);
 
-  request_response_mode(session);
+  if (r == 0)
+    request_response_mode(session);
   
   free_session(session);
   
