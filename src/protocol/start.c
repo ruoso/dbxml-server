@@ -180,10 +180,8 @@ void protocol_start_session(DbXmlSessionData *session) {
   if (r == 0)
     init = r = initialize_session(session);
 
-  if (session_response(session, r) != 0) {
-    free_session(session);
+  if (session_response(session, r) != 0)
     return;
-  }
 
   r = receive_session_options(session, &options);
 
