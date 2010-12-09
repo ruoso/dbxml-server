@@ -8,10 +8,11 @@ class DbXmlSession {
   DB_ENV* env;
   DbXml::XmlManager* manager;
   DbXmlSessionData* session;
-  DbXmlSessionOptions* options[];
+  DbXmlSessionOptions options;
 public:
   DbXmlSession(DbXmlSessionData* session,
                DbXmlSessionOptions* options,
                DbXmlSessionOptions** ret);
+  ~DbXmlSession();
   int command(DbXmlRequest* req, DbXmlResponse* res);
 };

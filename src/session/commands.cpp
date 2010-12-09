@@ -8,9 +8,9 @@ extern "C" {
 int session_request(DbXmlSessionData* session, DbXmlRequest* req, DbXmlResponse* res) {
   try {
     DbXmlSession* s = (DbXmlSession*)(session->Session.priv_data);
-    s->command(req, res);
-    return 0;
+    return s->command(req, res);
   } catch (...) {
+    LOG_ERROR("Failed to run the command.\n");
     return -1;
   }
 }

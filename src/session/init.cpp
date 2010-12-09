@@ -14,6 +14,7 @@ int initialize_session(DbXmlSessionData* session,
     session->Session.priv_data = s;
     return 0;
   } catch (...) {
+    LOG_ERROR("Failed to initialize the environment.\n");
     return -1;
   }
 }
@@ -23,6 +24,7 @@ int free_session(DbXmlSessionData* session) {
     delete (DbXmlSession*)(session->Session.priv_data);
     return 0;
   } catch (...) {
+    LOG_ERROR("Failed to initialize the environment.\n");
     return -1;
   }
 }

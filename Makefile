@@ -1,10 +1,11 @@
 CC=gcc
 CXX=g++
 DBXML_INCLUDE=/usr/local/BerkeleyDBXML.2.5/include/dbxml
+DBXML_LIBDIR=/usr/local/BerkeleyDBXML.2.5/lib
 CFLAGS=-Wall -pthread `pkg-config gnutls --cflags` -g
 CXXFLAGS=-Wall -I$(DBXML_INCLUDE) -pthread `pkg-config gnutls --cflags` -g
 LDFLAGS=-pthread 
-LIBS=`pkg-config gnutls --libs`
+LIBS=`pkg-config gnutls --libs` -L$(DBXML_LIBDIR) -ldb -ldbxml
 
 SOURCpp_MAIN = src/main/main.cpp
 SOURCES_MAIN = src/main/options.c

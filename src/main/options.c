@@ -11,7 +11,7 @@ void parse_options(int argc, char* argv[], DbXmlServerOptions* ret) {
 
   // default values
   ret->Authentication.module = "basic";
-  ret->Main.server_home = ".";
+  ret->Main.server_home = "./data/";
   char* bind_address = "0";
   char* bind_port = "47156";
   strcpy(ret->Encryption.keyfile, "server.key");
