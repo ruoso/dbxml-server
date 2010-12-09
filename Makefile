@@ -19,7 +19,7 @@ SOURCES_PROT  = src/protocol/start.c src/protocol/reqres.c
 HEADERS_PROT  = src/protocol/protocol.h src/protocol/io.h
 OBJECTS_PROT  = $(SOURCES_PROT:.c=.o)
 
-SOURCES_SESS  = src/session/init.c
+SOURCES_SESS  = src/session/init.c src/session/commands.c
 HEADERS_SESS  = src/session/session.h
 OBJECTS_SESS  = $(SOURCES_PROT:.c=.o)
 

@@ -1,4 +1,5 @@
 #include "io.h"
+#include "../session/session.h"
 
 int receive_command(DbXmlSessionData* session, DbXmlRequest *req) {
   READLINEVARS;
@@ -163,8 +164,8 @@ void protocol_request_response(DbXmlSessionData* session) {
     if (r == 0)
       r = receive_headers(session, &req);
     
-    //if (r == 0)
-    //  session_request(session, &req, &res);
+    if (r == 0)
+      session_request(session, &req, &res);
 
     if (r == 0)
       r = consume_remaining_req_body(session, &req);
