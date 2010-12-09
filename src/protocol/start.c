@@ -1,4 +1,5 @@
 #include "io.h"
+#include "../session/session.h"
 
 int initial_handshake(DbXmlSessionData* session) {
 
@@ -114,12 +115,6 @@ int receive_session_options(DbXmlSessionData* session, DbXmlSessionOptions* opti
   return 0;
 }
 
-int initialize_session(DbXmlSessionData* session, DbXmlSessionOptions* options, DbXmlSessionOptions** ret) {
-  // TODO: proper initialization. Just echoes for now.
-  *ret = options;
-  return 0;
-}
-
 int send_session_options(DbXmlSessionData* session, DbXmlSessionOptions* options) {
   WRITEDATAVARS;
   int header_count = 0;
@@ -145,11 +140,6 @@ int free_session_options(DbXmlSessionData* session, DbXmlSessionOptions* options
     if (options->headers[header_count])
       free(options->headers[header_count]);
   }
-  return 0;
-}
-
-int free_session(DbXmlSessionData* session) {
-  // TODO
   return 0;
 }
 

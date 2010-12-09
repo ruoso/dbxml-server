@@ -19,7 +19,11 @@ SOURCES_PROT  = src/protocol/start.c src/protocol/reqres.c
 HEADERS_PROT  = src/protocol/protocol.h src/protocol/io.h
 OBJECTS_PROT  = $(SOURCES_PROT:.c=.o)
 
-ALL_OBJECTS  = $(OBJECTS_MAIN) $(OBJECTS_CONN) $(OBJECTS_TLS) $(OBJECTS_PROT)
+SOURCES_SESS  = src/session/init.c
+HEADERS_SESS  = src/session/session.h
+OBJECTS_SESS  = $(SOURCES_PROT:.c=.o)
+
+ALL_OBJECTS  = $(OBJECTS_MAIN) $(OBJECTS_CONN) $(OBJECTS_TLS) $(OBJECTS_PROT) $(OBJECTS_SESS)
 
 dbxml_server: $(ALL_OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $(ALL_OBJECTS) $(LIBS)
@@ -32,7 +36,9 @@ $(OBJECTS_CONN): $(HEADERS_TLS)
 
 $(OBJECTS_TLS): $(HEADERS_PROT)
 
-$(OBJECTS_PROT): $(HEADERS_TLS)
+$(OBJECTS_PROT): $(HEADERS_TLS) $(HEADERS_SESSION)
+
+$(OBJECTS_SESS): $(HEADERS_PROT)
 
 clean:
 	rm -fv dbxml_server $(ALL_OBJECTS)
