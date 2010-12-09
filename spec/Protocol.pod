@@ -121,6 +121,11 @@ sending requests.
 
 =head1 Request/Response
 
+=head2 Closing the connection
+
+To end the connection the client may send a line with "QUIT". The
+server will immediately close the connection without further output.
+
 =head2 Request
 
 The server is always listening for requests. The request format is the

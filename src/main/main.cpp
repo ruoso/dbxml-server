@@ -1,8 +1,11 @@
+
+extern "C" {
 #include <string.h>
 #include "main.h"
 #include "options.h"
 #include "../conn/bind.h"
 #include "../tls/init.h"
+}
 
 int main(int argc, char* argv[]) {
 

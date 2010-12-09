@@ -1,11 +1,14 @@
 CC=gcc
+CXX=g++
 CFLAGS=-Wall -pthread `pkg-config gnutls --cflags` -g
-LDFLAGS=-pthread `pkg-config gnutls --libs`
-LIBS=
+CXXFLAGS=-Wall -pthread `pkg-config gnutls --cflags` -g
+LDFLAGS=-pthread 
+LIBS=`pkg-config gnutls --libs`
 
-SOURCES_MAIN = src/main/main.c src/main/options.c
+SOURCpp_MAIN = src/main/main.cpp
+SOURCES_MAIN = src/main/options.c
 HEADERS_MAIN = src/main/main.h src/main/options.h src/main/session.h
-OBJECTS_MAIN = $(SOURCES_MAIN:.c=.o)
+OBJECTS_MAIN = $(SOURCES_MAIN:.c=.o) $(SOURCpp_MAIN:.cpp=.o)
 
 SOURCES_CONN = src/conn/bind.c src/conn/handle_client.c
 HEADERS_CONN = src/conn/bind.h src/conn/handle_client.h
@@ -19,14 +22,14 @@ SOURCES_PROT  = src/protocol/start.c src/protocol/reqres.c
 HEADERS_PROT  = src/protocol/protocol.h src/protocol/io.h
 OBJECTS_PROT  = $(SOURCES_PROT:.c=.o)
 
-SOURCES_SESS  = src/session/init.c src/session/commands.c
+SOURCES_SESS  = src/session/init.cpp src/session/commands.cpp
 HEADERS_SESS  = src/session/session.h
-OBJECTS_SESS  = $(SOURCES_PROT:.c=.o)
+OBJECTS_SESS  = $(SOURCES_SESS:.cpp=.o)
 
 ALL_OBJECTS  = $(OBJECTS_MAIN) $(OBJECTS_CONN) $(OBJECTS_TLS) $(OBJECTS_PROT) $(OBJECTS_SESS)
 
 dbxml_server: $(ALL_OBJECTS)
-	$(CC) $(LDFLAGS) -o $@ $(ALL_OBJECTS) $(LIBS)
+	$(CXX) $(LDFLAGS) $(LIBS) $(ALL_OBJECTS) -o $@
 
 $(ALL_OBJECTS): $(HEADERS_MAIN)
 
