@@ -1,7 +1,8 @@
 CC=gcc
 CXX=g++
+DBXML_INCLUDE=/usr/local/BerkeleyDBXML.2.5/include/dbxml
 CFLAGS=-Wall -pthread `pkg-config gnutls --cflags` -g
-CXXFLAGS=-Wall -pthread `pkg-config gnutls --cflags` -g
+CXXFLAGS=-Wall -I$(DBXML_INCLUDE) -pthread `pkg-config gnutls --cflags` -g
 LDFLAGS=-pthread 
 LIBS=`pkg-config gnutls --libs`
 
@@ -22,8 +23,8 @@ SOURCES_PROT  = src/protocol/start.c src/protocol/reqres.c
 HEADERS_PROT  = src/protocol/protocol.h src/protocol/io.h
 OBJECTS_PROT  = $(SOURCES_PROT:.c=.o)
 
-SOURCES_SESS  = src/session/init.cpp src/session/commands.cpp
-HEADERS_SESS  = src/session/session.h
+SOURCES_SESS  = src/session/init.cpp src/session/commands.cpp src/session/session.cpp
+HEADERS_SESS  = src/session/session.h src/session/session.hpp
 OBJECTS_SESS  = $(SOURCES_SESS:.cpp=.o)
 
 ALL_OBJECTS  = $(OBJECTS_MAIN) $(OBJECTS_CONN) $(OBJECTS_TLS) $(OBJECTS_PROT) $(OBJECTS_SESS)

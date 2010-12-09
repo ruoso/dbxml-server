@@ -16,6 +16,7 @@ typedef struct DbXmlSessionData {
   struct {
     char env_name[256];
     float client_version;
+    void* priv_data;
   } Session;
 } DbXmlSessionData;
 
